@@ -39,9 +39,13 @@ public class App {
 
   public static void main(String[] args)
       throws ExecutionException, InterruptedException, IOException {
-    Map<String, Object> config = loadConfig("/Users/alexdiachenko/pkc-zm6j0.txt");
+
+    String configPath = args[1];
+    String pccToBeDeletedPath = args[2];
+
+    Map<String, Object> config = loadConfig(configPath);
     List<String> physicalClusters = IOUtils
-        .readLines(new FileInputStream("/Users/alexdiachenko/deactivated_pccs.txt"),
+        .readLines(new FileInputStream(pccToBeDeletedPath),
             StandardCharsets.UTF_8);
     AdminClient adminClient = AdminClient.create(config);
 
