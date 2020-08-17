@@ -8,42 +8,37 @@ import org.apache.kafka.common.KafkaFuture;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 public class App {
 
-  public static Map<String, Object> loadConfig(String configFile) throws IOException {
-    if (!Files.exists(Paths.get(configFile))) {
-      throw new IOException(configFile + " not found.");
-    }
-    final Properties cfg = new Properties();
-    try (InputStream inputStream = new FileInputStream(configFile)) {
-      cfg.load(inputStream);
-    }
+  public static Map<String, Object> buildConfigs(String kafkaEndpoint, String userName, String password) {
     Map<String, Object> config = new HashMap<>();
-    for (final String name : cfg.stringPropertyNames()) {
-      config.put(name, cfg.getProperty(name));
-    }
+    config.put("bootstrap.servers", kafkaEndpoint);
+    config.put("ssl.endpoint.identification.algorithm", "https");
+    config.put("sasl.mechanism", "PLAIN");
+    config.put("request.timeout.ms", "20000");
+    config.put("retry.backoff.ms", "500");
+    config.put("sasl.jaas.config", String.format("org.apache.kafka.common.security.plain.PlainLoginModule required username=\"%s\" password=\"%s\";", userName, password));
+    config.put("security.protocol", "SASL_SSL");
     return config;
   }
 
   public static void main(String[] args)
       throws ExecutionException, InterruptedException, IOException {
 
-    String configPath = args[1];
-    String pccToBeDeletedPath = args[2];
+    String kafkaEndpoint = args[0];
+    String userName = args[1];
+    String password = args[2];
+    String pccToBeDeletedPath = args[3];
 
-    Map<String, Object> config = loadConfig(configPath);
+    Map<String, Object> config = buildConfigs(kafkaEndpoint, userName, password);
     List<String> physicalClusters = IOUtils
         .readLines(new FileInputStream(pccToBeDeletedPath),
             StandardCharsets.UTF_8);
