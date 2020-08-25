@@ -3,9 +3,9 @@
 $ sudo -i psql -c "select distinct physical_cluster_id from deployment.logical_cluster where type = 'connect' and config->>'connector' like '%pkc-z35v3%' and deactivated is not null;"|grep pcc > deactivated_pccs.txt
 ``` 
 Copy it from bastion to your local machine:
-
+```
 $ scp -i ~/.ssh/caas-alex.diachenko -i ~/.ssh/caas-alex.diachenko-stag-cert.pub alex.diachenko@0.bastion.us-west-2.aws.internal.stag.cpdev.cloud:/home/alex.diachenko/deactivated_pccs.txt ~/Desktop/deactivated_pccs.txt
-...
+```
 
 ## Finding Kafka endpoint and credentials by pkc:
 ```
